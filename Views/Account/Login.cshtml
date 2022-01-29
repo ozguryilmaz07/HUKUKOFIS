@@ -1,0 +1,47 @@
+﻿@{
+    Layout = null;
+}
+
+@model OpenLawOffice.Web.ViewModels.Account.LoginViewModel
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>Login</title>
+    <!-- Bootstrap core CSS -->
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/Content/font-awesome.min.css" />
+
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    @*<link href="../../assets/css/ie10-viewport-bug-workaround.css" rel="stylesheet">*@
+
+    <!-- Custom styles for this template -->
+    <link href="~/Content/signin.css" rel="stylesheet" />
+</head>
+<body>
+    <div class="container">
+
+@using (Html.BeginForm("Login", "Account", FormMethod.Post, new { @class = "form-signin" }))
+{
+            <h2 class="form-signin-heading">Please sign in</h2>
+            @(Html.TextBoxFor(m => m.Username, new { @class = "form-control", @placeholder = "Username", @required = "required", @autofocus = "autofocus" }))
+            @(Html.PasswordFor(m => m.Password, new { @class = "form-control", @placeholder = "Password", @required = "required", @autofocus = "autofocus" }))
+
+            <div class="checkbox">
+                <label>
+                    @(Html.CheckBoxFor(m => m.RememberMe)) Remember me
+                </label>
+            </div>
+            <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+            <div style="margin-top: 15px;">
+                @(Html.ActionLink("Register", "Register")) if you don't have an account.<br />
+                @(Html.ActionLink("Recover", "Recovery")) if you forgot.
+            </div>
+}
+
+    </div>
+</body>
+</html>

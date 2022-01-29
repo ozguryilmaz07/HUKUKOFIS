@@ -1,0 +1,1808 @@
+﻿7/4/2017
+
+-- Table: activity_type
+
+-- DROP TABLE activity_type;
+
+CREATE TABLE activity_type
+(
+  id integer NOT NULL,
+  title text NOT NULL,
+  "order" integer NOT NULL,
+  CONSTRAINT activity_type_pkey PRIMARY KEY (id),
+  CONSTRAINT "activity_type_order_UK" UNIQUE ("order")
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE activity_type
+  OWNER TO postgres;
+
+-- Table: activity_status_reason
+
+-- DROP TABLE activity_status_reason;
+
+CREATE TABLE activity_status_reason
+(
+  id serial NOT NULL,
+  "primary" text NOT NULL,
+  secondary text NOT NULL,
+  "order" integer NOT NULL,
+  CONSTRAINT activity_status_reason_pkey PRIMARY KEY (id),
+  CONSTRAINT "activity_status_reason_order_UK" UNIQUE ("order")
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE activity_status_reason
+  OWNER TO postgres;
+
+-- Table: activity_regarding_type
+
+-- DROP TABLE activity_regarding_type;
+
+CREATE TABLE activity_regarding_type
+(
+  id integer NOT NULL,
+  title text NOT NULL,
+  "order" integer NOT NULL,
+  "default" boolean NOT NULL,
+  CONSTRAINT "activity_regarding_type_PKEY" PRIMARY KEY (id),
+  CONSTRAINT "activity_regarding_type_order_UK" UNIQUE ("order")
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE activity_regarding_type
+  OWNER TO postgres;
+
+-- Table: activity_priority
+
+-- DROP TABLE activity_priority;
+
+CREATE TABLE activity_priority
+(
+  id integer NOT NULL,
+  title text NOT NULL,
+  "order" integer NOT NULL,
+  "default" boolean NOT NULL,
+  CONSTRAINT activity_priority_pkey PRIMARY KEY (id),
+  CONSTRAINT "activity_priority_order_UK" UNIQUE ("order")
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE activity_priority
+  OWNER TO postgres;
+
+-- Table: activity_direction
+
+-- DROP TABLE activity_direction;
+
+CREATE TABLE activity_direction
+(
+  id integer NOT NULL,
+  title text NOT NULL,
+  "order" integer NOT NULL,
+  CONSTRAINT activity_direction_pkey PRIMARY KEY (id),
+  CONSTRAINT "activity_direction_order_UK" UNIQUE ("order")
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE activity_direction
+  OWNER TO postgres;
+
+-- Table: activity_base
+
+-- DROP TABLE activity_base;
+
+CREATE TABLE activity_base
+(
+  id bigserial NOT NULL,
+  type integer NOT NULL,
+  is_campaign_response boolean NOT NULL,
+  subject text,
+  body text,
+  owner integer NOT NULL,
+  priority integer NOT NULL,
+  due timestamp without time zone,
+  state boolean NOT NULL,
+  status_reason integer NOT NULL,
+  duration integer,
+  CONSTRAINT activity_base_pkey PRIMARY KEY (id),
+  CONSTRAINT activity_base_activity_type_id FOREIGN KEY (type)
+      REFERENCES activity_type (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT activity_base_contact_id FOREIGN KEY (owner)
+      REFERENCES contact (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT activity_base_priority_id FOREIGN KEY (priority)
+      REFERENCES activity_priority (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT activity_base_status_reason_id FOREIGN KEY (status_reason)
+      REFERENCES activity_status_reason (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+INHERITS (core)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE activity_base
+  OWNER TO postgres;
+
+-- Table: activity_correspondence_base
+
+-- DROP TABLE activity_correspondence_base;
+
+CREATE TABLE activity_correspondence_base
+(
+-- Inherited from table activity_base:  id bigint NOT NULL DEFAULT nextval('activity_base_id_seq'::regclass),
+-- Inherited from table activity_base:  type integer NOT NULL,
+-- Inherited from table activity_base:  is_campaign_response boolean NOT NULL,
+-- Inherited from table activity_base:  subject text,
+-- Inherited from table activity_base:  body text,
+-- Inherited from table activity_base:  owner integer NOT NULL,
+-- Inherited from table activity_base:  priority integer NOT NULL,
+-- Inherited from table activity_base:  due timestamp without time zone,
+-- Inherited from table activity_base:  state boolean NOT NULL,
+-- Inherited from table activity_base:  status_reason integer NOT NULL,
+-- Inherited from table activity_base:  start timestamp without time zone,
+-- Inherited from table activity_base:  stop timestamp without time zone,
+  sender integer,
+  recipient integer,
+  direction integer,
+  CONSTRAINT activity_correspondence_base_pkey PRIMARY KEY (id),
+  CONSTRAINT activity_correspondence_base_activity_type_id FOREIGN KEY (type)
+      REFERENCES activity_type (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT activity_correspondence_base_contact_id FOREIGN KEY (owner)
+      REFERENCES contact (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT activity_correspondence_base_direction FOREIGN KEY (direction)
+      REFERENCES activity_direction (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT activity_correspondence_base_priority_id FOREIGN KEY (priority)
+      REFERENCES activity_priority (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT activity_correspondence_base_recipient FOREIGN KEY (recipient)
+      REFERENCES contact (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT activity_correspondence_base_sender FOREIGN KEY (sender)
+      REFERENCES contact (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT activity_correspondence_base_status_reason_id FOREIGN KEY (status_reason)
+      REFERENCES activity_status_reason (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+INHERITS (activity_base)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE activity_correspondence_base
+  OWNER TO postgres;
+
+-- Table: activity_email
+
+-- DROP TABLE activity_email;
+
+CREATE TABLE activity_email
+(
+-- Inherited from table activity_correspondence_base:  id bigint NOT NULL DEFAULT nextval('activity_base_id_seq'::regclass),
+-- Inherited from table activity_correspondence_base:  type integer NOT NULL,
+-- Inherited from table activity_correspondence_base:  is_campaign_response boolean NOT NULL,
+-- Inherited from table activity_correspondence_base:  subject text,
+-- Inherited from table activity_correspondence_base:  body text,
+-- Inherited from table activity_correspondence_base:  regarding integer NOT NULL,
+-- Inherited from table activity_correspondence_base:  owner integer NOT NULL,
+-- Inherited from table activity_correspondence_base:  priority integer NOT NULL,
+-- Inherited from table activity_correspondence_base:  due timestamp without time zone,
+-- Inherited from table activity_correspondence_base:  state boolean NOT NULL,
+-- Inherited from table activity_correspondence_base:  status_reason integer NOT NULL,
+-- Inherited from table activity_correspondence_base:  start timestamp without time zone,
+-- Inherited from table activity_correspondence_base:  stop timestamp without time zone,
+-- Inherited from table activity_correspondence_base:  sender integer,
+-- Inherited from table activity_correspondence_base:  recipient integer,
+-- Inherited from table activity_correspondence_base:  direction integer,
+  address text,
+  CONSTRAINT activity_email_pkey PRIMARY KEY (id),
+  CONSTRAINT activity_email_activity_type_id FOREIGN KEY (type)
+      REFERENCES activity_type (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT activity_email_contact_id FOREIGN KEY (owner)
+      REFERENCES contact (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT activity_email_direction FOREIGN KEY (direction)
+      REFERENCES activity_direction (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT activity_email_priority_id FOREIGN KEY (priority)
+      REFERENCES activity_priority (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT activity_email_recipient FOREIGN KEY (recipient)
+      REFERENCES contact (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT activity_email_sender FOREIGN KEY (sender)
+      REFERENCES contact (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT activity_email_status_reason_id FOREIGN KEY (status_reason)
+      REFERENCES activity_status_reason (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+INHERITS (activity_correspondence_base)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE activity_email
+  OWNER TO postgres;
+
+-- Table: activity_letter
+
+-- DROP TABLE activity_letter;
+
+CREATE TABLE activity_letter
+(
+-- Inherited from table activity_correspondence_base:  id bigint NOT NULL DEFAULT nextval('activity_base_id_seq'::regclass),
+-- Inherited from table activity_correspondence_base:  type integer NOT NULL,
+-- Inherited from table activity_correspondence_base:  is_campaign_response boolean NOT NULL,
+-- Inherited from table activity_correspondence_base:  subject text,
+-- Inherited from table activity_correspondence_base:  body text,
+-- Inherited from table activity_correspondence_base:  owner integer NOT NULL,
+-- Inherited from table activity_correspondence_base:  priority integer NOT NULL,
+-- Inherited from table activity_correspondence_base:  due timestamp without time zone,
+-- Inherited from table activity_correspondence_base:  state boolean NOT NULL,
+-- Inherited from table activity_correspondence_base:  status_reason integer NOT NULL,
+-- Inherited from table activity_correspondence_base:  start timestamp without time zone,
+-- Inherited from table activity_correspondence_base:  stop timestamp without time zone,
+-- Inherited from table activity_correspondence_base:  sender integer,
+-- Inherited from table activity_correspondence_base:  recipient integer,
+-- Inherited from table activity_correspondence_base:  direction integer,
+  address text,
+  CONSTRAINT activity_letter_pkey PRIMARY KEY (id),
+  CONSTRAINT activity_letter_activity_type_id FOREIGN KEY (type)
+      REFERENCES activity_type (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT activity_letter_contact_id FOREIGN KEY (owner)
+      REFERENCES contact (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT activity_letter_direction FOREIGN KEY (direction)
+      REFERENCES activity_direction (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT activity_letter_priority_id FOREIGN KEY (priority)
+      REFERENCES activity_priority (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT activity_letter_recipient FOREIGN KEY (recipient)
+      REFERENCES contact (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT activity_letter_sender FOREIGN KEY (sender)
+      REFERENCES contact (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT activity_letter_status_reason_id FOREIGN KEY (status_reason)
+      REFERENCES activity_status_reason (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+INHERITS (activity_correspondence_base)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE activity_letter
+  OWNER TO postgres;
+
+-- Table: activity_phonecall
+
+-- DROP TABLE activity_phonecall;
+
+CREATE TABLE activity_phonecall
+(
+-- Inherited from table activity_correspondence_base:  id bigint NOT NULL DEFAULT nextval('activity_base_id_seq'::regclass),
+-- Inherited from table activity_correspondence_base:  type integer NOT NULL,
+-- Inherited from table activity_correspondence_base:  is_campaign_response boolean NOT NULL,
+-- Inherited from table activity_correspondence_base:  subject text,
+-- Inherited from table activity_correspondence_base:  body text,
+-- Inherited from table activity_correspondence_base:  owner integer NOT NULL,
+-- Inherited from table activity_correspondence_base:  priority integer NOT NULL,
+-- Inherited from table activity_correspondence_base:  due timestamp without time zone,
+-- Inherited from table activity_correspondence_base:  state boolean NOT NULL,
+-- Inherited from table activity_correspondence_base:  status_reason integer NOT NULL,
+-- Inherited from table activity_correspondence_base:  start timestamp without time zone,
+-- Inherited from table activity_correspondence_base:  stop timestamp without time zone,
+-- Inherited from table activity_correspondence_base:  sender integer,
+-- Inherited from table activity_correspondence_base:  recipient integer,
+-- Inherited from table activity_correspondence_base:  direction integer,
+  phone_number text,
+  CONSTRAINT activity_phonecall_pkey PRIMARY KEY (id),
+  CONSTRAINT activity_phonecall_activity_type_id FOREIGN KEY (type)
+      REFERENCES activity_type (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT activity_phonecall_contact_id FOREIGN KEY (owner)
+      REFERENCES contact (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT activity_phonecall_direction FOREIGN KEY (direction)
+      REFERENCES activity_direction (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT activity_phonecall_priority_id FOREIGN KEY (priority)
+      REFERENCES activity_priority (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT activity_phonecall_recipient FOREIGN KEY (recipient)
+      REFERENCES contact (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT activity_phonecall_sender FOREIGN KEY (sender)
+      REFERENCES contact (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT activity_phonecall_status_reason_id FOREIGN KEY (status_reason)
+      REFERENCES activity_status_reason (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+INHERITS (activity_correspondence_base)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE activity_phonecall
+  OWNER TO postgres;
+
+-- Table: activity_task
+
+-- DROP TABLE activity_task;
+
+CREATE TABLE activity_task
+(
+-- Inherited from table activity_base:  id bigint NOT NULL DEFAULT nextval('activity_base_id_seq'::regclass),
+-- Inherited from table activity_base:  type integer NOT NULL,
+-- Inherited from table activity_base:  is_campaign_response boolean NOT NULL,
+-- Inherited from table activity_base:  subject text,
+-- Inherited from table activity_base:  body text,
+-- Inherited from table activity_base:  owner integer NOT NULL,
+-- Inherited from table activity_base:  priority integer NOT NULL,
+-- Inherited from table activity_base:  due timestamp without time zone,
+-- Inherited from table activity_base:  state boolean NOT NULL,
+-- Inherited from table activity_base:  status_reason integer NOT NULL,
+-- Inherited from table activity_base:  start timestamp without time zone,
+-- Inherited from table activity_base:  stop timestamp without time zone,
+  CONSTRAINT activity_task_pkey PRIMARY KEY (id),
+  CONSTRAINT activity_task_activity_type_id FOREIGN KEY (type)
+      REFERENCES activity_type (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT activity_task_contact_id FOREIGN KEY (owner)
+      REFERENCES contact (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT activity_task_priority_id FOREIGN KEY (priority)
+      REFERENCES activity_priority (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT activity_task_status_reason_id FOREIGN KEY (status_reason)
+      REFERENCES activity_status_reason (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+INHERITS (activity_base)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE activity_task
+  OWNER TO postgres;
+
+-- Table: activity_regarding_base
+
+-- DROP TABLE activity_regarding_base;
+
+CREATE TABLE activity_regarding_base
+(
+  id bigserial NOT NULL,
+  type integer NOT NULL,
+  activity bigint NOT NULL,
+  CONSTRAINT "activity_regarding_base_PKEY" PRIMARY KEY (id),
+  CONSTRAINT activity_regarding_base_activity FOREIGN KEY (activity)
+      REFERENCES activity_base (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT "activity_regarding_base_type_FK" FOREIGN KEY (type)
+      REFERENCES activity_regarding_type (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE activity_regarding_base
+  OWNER TO postgres;
+
+-- Table: activity_regarding_lead
+
+-- DROP TABLE activity_regarding_lead;
+
+CREATE TABLE activity_regarding_lead
+(
+-- Inherited from table activity_regarding_base:  id bigint NOT NULL DEFAULT nextval('activity_regarding_base_id_seq'::regclass),
+-- Inherited from table activity_regarding_base:  type integer NOT NULL,
+  lead bigint NOT NULL,
+-- Inherited from table :  activity bigint NOT NULL,
+  CONSTRAINT "activity_regarding_lead_PKEY" PRIMARY KEY (id),
+  CONSTRAINT activity_regarding_lead_lead FOREIGN KEY (lead)
+      REFERENCES lead (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+INHERITS (activity_regarding_base)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE activity_regarding_lead
+  OWNER TO postgres;
+
+-- Table: activity_regarding_opportunity
+
+-- DROP TABLE activity_regarding_opportunity;
+
+CREATE TABLE activity_regarding_opportunity
+(
+-- Inherited from table activity_regarding_base:  id bigint NOT NULL DEFAULT nextval('activity_regarding_base_id_seq'::regclass),
+-- Inherited from table activity_regarding_base:  type integer NOT NULL,
+  opportunity bigint NOT NULL,
+-- Inherited from table :  activity bigint NOT NULL,
+  CONSTRAINT "activity_regarding_opportunity_PKEY" PRIMARY KEY (id),
+  CONSTRAINT activity_regarding_opportunity_lead FOREIGN KEY (opportunity)
+      REFERENCES opportunity (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+INHERITS (activity_regarding_base)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE activity_regarding_opportunity
+  OWNER TO postgres;
+
+
+INSERT INTO activity_priority (id, title, "order", "default") VALUES (1, 'Low', 1, false);
+INSERT INTO activity_priority (id, title, "order", "default") VALUES (2, 'Normal', 2, true);
+INSERT INTO activity_priority (id, title, "order", "default") VALUES (3, 'High', 3, false);
+INSERT INTO activity_direction(id, title, "order") VALUES (1, 'Incoming', 1);
+INSERT INTO activity_direction(id, title, "order") VALUES (2, 'Outgoing', 2);
+INSERT INTO activity_type(id, title, "order") VALUES (1, 'Phone Call', 1);
+INSERT INTO activity_type(id, title, "order") VALUES (2, 'Email', 2);
+INSERT INTO activity_type(id, title, "order") VALUES (3, 'Letter', 3);
+INSERT INTO activity_type(id, title, "order") VALUES (4, 'Task', 4);
+INSERT INTO activity_status_reason(id, "primary", secondary, "order") VALUES (1, 'Active', 'In Progress', 1);
+INSERT INTO activity_status_reason(id, "primary", secondary, "order") VALUES (2, 'Active', 'On Hold', 2);
+INSERT INTO activity_status_reason(id, "primary", secondary, "order") VALUES (3, 'Active', 'Waiting for Details', 3);
+INSERT INTO activity_status_reason(id, "primary", secondary, "order") VALUES (4, 'Active', 'Researching', 4);
+INSERT INTO activity_status_reason(id, "primary", secondary, "order") VALUES (5, 'Resolved', 'Problem Solved', 5);
+INSERT INTO activity_status_reason(id, "primary", secondary, "order") VALUES (6, 'Resolved', 'Information Provided', 6);
+INSERT INTO activity_status_reason(id, "primary", secondary, "order") VALUES (7, 'Canceled', 'Canceled', 7);
+INSERT INTO activity_regarding_type(id, title, "order", "default") VALUES (1, 'Lead', 1, true);
+INSERT INTO activity_regarding_type(id, title, "order", "default") VALUES (2, 'Opportunity', 2, false);
+
+
+
+
+6/25/2017
+-- Table: opportunity_contact
+
+-- DROP TABLE opportunity_contact;
+
+CREATE TABLE opportunity_contact
+(
+-- Inherited from table core:  created_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  modified_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  disabled_by_user_pid uuid,
+-- Inherited from table core:  utc_created timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_modified timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_disabled timestamp without time zone,
+  id serial NOT NULL,
+  contact_id integer NOT NULL,
+  opportunity_id bigint NOT NULL,
+  CONSTRAINT opportunity_contact_pkey PRIMARY KEY (id),
+  CONSTRAINT "FK_opportunity_contact_contact_id" FOREIGN KEY (contact_id)
+      REFERENCES contact (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT "FK_opportunity_contact_opportunity_id" FOREIGN KEY (opportunity_id)
+      REFERENCES opportunity (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+INHERITS (core)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE opportunity_contact
+  OWNER TO postgres;
+
+
+5/13/2017
+-- Table: lead_status
+
+-- DROP TABLE lead_status;
+
+CREATE TABLE lead_status
+(
+-- Inherited from table core:  created_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  modified_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  disabled_by_user_pid uuid,
+-- Inherited from table core:  utc_created timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_modified timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_disabled timestamp without time zone,
+  id serial NOT NULL,
+  title text NOT NULL,
+  CONSTRAINT lead_status_pkey PRIMARY KEY (id)
+)
+INHERITS (core)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE lead_status
+  OWNER TO postgres;
+
+
+-- Table: lead_source_type
+
+-- DROP TABLE lead_source_type;
+
+CREATE TABLE lead_source_type
+(
+-- Inherited from table core:  created_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  modified_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  disabled_by_user_pid uuid,
+-- Inherited from table core:  utc_created timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_modified timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_disabled timestamp without time zone,
+  id serial NOT NULL,
+  title text NOT NULL,
+  CONSTRAINT lead_source_type_pkey PRIMARY KEY (id)
+)
+INHERITS (core)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE lead_source_type
+  OWNER TO postgres;
+
+
+-- Table: lead_source
+
+-- DROP TABLE lead_source;
+
+CREATE TABLE lead_source
+(
+-- Inherited from table core:  created_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  modified_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  disabled_by_user_pid uuid,
+-- Inherited from table core:  utc_created timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_modified timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_disabled timestamp without time zone,
+  id serial NOT NULL,
+  type_id integer NOT NULL,
+  contact_id integer,
+  title text NOT NULL,
+  additional_question_1 text,
+  additional_data_1 text,
+  additional_question_2 text,
+  additional_data_2 text,
+  CONSTRAINT lead_source_pk PRIMARY KEY (id),
+  CONSTRAINT lead_source_contact_id FOREIGN KEY (contact_id)
+      REFERENCES contact (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT lead_source_type_id_unique FOREIGN KEY (type_id)
+      REFERENCES lead_source_type (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+INHERITS (core)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE lead_source
+  OWNER TO postgres;
+
+-- Table: lead_fee
+
+-- DROP TABLE lead_fee;
+
+CREATE TABLE lead_fee
+(
+-- Inherited from table core:  created_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  modified_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  disabled_by_user_pid uuid,
+-- Inherited from table core:  utc_created timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_modified timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_disabled timestamp without time zone,
+  id serial NOT NULL,
+  is_eligible boolean NOT NULL,
+  amount money,
+  to_id integer,
+  paid timestamp with time zone,
+  additional_data text,
+  CONSTRAINT load_fee_pkey PRIMARY KEY (id),
+  CONSTRAINT load_fee_contact_id FOREIGN KEY (to_id)
+      REFERENCES contact (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+INHERITS (core)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE lead_fee
+  OWNER TO postgres;
+
+-- Table: lead
+
+-- DROP TABLE lead;
+
+CREATE TABLE lead
+(
+-- Inherited from table core:  created_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  modified_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  disabled_by_user_pid uuid,
+-- Inherited from table core:  utc_created timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_modified timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_disabled timestamp without time zone,
+  id bigserial NOT NULL,
+  status_id integer NOT NULL,
+  contact_id integer NOT NULL,
+  source_id integer,
+  fee_id integer,
+  closed timestamp without time zone,
+  details text,
+  CONSTRAINT lead_pkey PRIMARY KEY (id),
+  CONSTRAINT lead_contact_id FOREIGN KEY (contact_id)
+      REFERENCES contact (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT lead_lead_fee_id FOREIGN KEY (fee_id)
+      REFERENCES lead_fee (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT lead_lead_source_id FOREIGN KEY (source_id)
+      REFERENCES lead_source (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT lead_status_lead_status_id FOREIGN KEY (status_id)
+      REFERENCES lead_status (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+INHERITS (core)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE lead
+  OWNER TO postgres;
+
+-- Table: opportunity_stage
+
+-- DROP TABLE opportunity_stage;
+
+CREATE TABLE opportunity_stage
+(
+-- Inherited from table core:  created_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  modified_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  disabled_by_user_pid uuid,
+-- Inherited from table core:  utc_created timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_modified timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_disabled timestamp without time zone,
+  id serial NOT NULL,
+  "order" integer NOT NULL,
+  title text NOT NULL,
+  CONSTRAINT opportunity_stage_pkey PRIMARY KEY (id),
+  CONSTRAINT opportunity_stage_order_unique UNIQUE ("order")
+)
+INHERITS (core)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE opportunity_stage
+  OWNER TO postgres;
+
+-- Table: opportunity
+
+-- DROP TABLE opportunity;
+
+CREATE TABLE opportunity
+(
+-- Inherited from table core:  created_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  modified_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  disabled_by_user_pid uuid,
+-- Inherited from table core:  utc_created timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_modified timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_disabled timestamp without time zone,
+  id bigserial NOT NULL,
+  account_id integer NOT NULL,
+  stage_id integer NOT NULL,
+  probability numeric(4,4),
+  amount money,
+  closed timestamp with time zone,
+  lead_id integer NOT NULL,
+  matter_id uuid,
+  CONSTRAINT opportunity_pkey PRIMARY KEY (id),
+  CONSTRAINT opportunity_contact_id FOREIGN KEY (account_id)
+      REFERENCES contact (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT opportunity_lead_id FOREIGN KEY (lead_id)
+      REFERENCES lead (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT opportunity_matter_id FOREIGN KEY (matter_id)
+      REFERENCES matter (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT opportunity_opportunity_stage_id FOREIGN KEY (stage_id)
+      REFERENCES opportunity_stage (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+INHERITS (core)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE opportunity
+  OWNER TO postgres;
+
+
+
+
+
+9/3/2016
+-- Table: time_category
+
+-- DROP TABLE time_category;
+
+CREATE TABLE time_category
+(
+-- Inherited from table core:  created_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  modified_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  disabled_by_user_pid uuid,
+-- Inherited from table core:  utc_created timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_modified timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_disabled timestamp without time zone,
+  id serial NOT NULL,
+  title text NOT NULL,
+  CONSTRAINT time_category_pkey PRIMARY KEY (id),
+  CONSTRAINT time_category_title_unique UNIQUE (title)
+)
+INHERITS (core)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE time_category
+  OWNER TO postgres;
+
+
+ALTER TABLE "time"
+  ADD COLUMN time_category_id integer;
+ALTER TABLE "time"
+  ADD CONSTRAINT "FK_time_category_TimeCategoryId" FOREIGN KEY (time_category_id) REFERENCES time_category (id) ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+
+4/10/2016
+-- Table: asset
+
+-- DROP TABLE asset;
+
+CREATE TABLE asset
+(
+-- Inherited from table core:  created_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  modified_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  disabled_by_user_pid uuid,
+-- Inherited from table core:  utc_created timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_modified timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_disabled timestamp without time zone,
+  id uuid NOT NULL,
+  id_int bigserial NOT NULL,
+  date timestamp without time zone NOT NULL,
+  title text NOT NULL,
+  is_final boolean NOT NULL,
+  is_court_filed boolean NOT NULL,
+  is_attorney_work_product boolean NOT NULL,
+  is_privileged boolean NOT NULL,
+  is_discoverable boolean NOT NULL,
+  provided_in_discovery_at timestamp without time zone,
+  checked_out_by_id uuid,
+  checked_out_at timestamp without time zone,
+  CONSTRAINT assets_pkey PRIMARY KEY (id),
+  CONSTRAINT "FK_asset_checked_out_by_users_id" FOREIGN KEY (checked_out_by_id)
+      REFERENCES "Users" ("pId") MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+INHERITS (core)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE asset
+  OWNER TO postgres;
+
+-- Table: version
+
+-- DROP TABLE version;
+
+CREATE TABLE version
+(
+-- Inherited from table core:  created_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  modified_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  disabled_by_user_pid uuid,
+-- Inherited from table core:  utc_created timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_modified timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_disabled timestamp without time zone,
+  id uuid NOT NULL,
+  sequence_number integer NOT NULL,
+  change_details text,
+  asset_id uuid NOT NULL,
+  CONSTRAINT version_pkey PRIMARY KEY (id),
+  CONSTRAINT "FK_version_asset_id_asset_id" FOREIGN KEY (asset_id)
+      REFERENCES asset (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+INHERITS (core)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE version
+  OWNER TO postgres;
+
+-- Table: file
+
+-- DROP TABLE file;
+
+CREATE TABLE file
+(
+-- Inherited from table core:  created_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  modified_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  disabled_by_user_pid uuid,
+-- Inherited from table core:  utc_created timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_modified timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_disabled timestamp without time zone,
+  id uuid NOT NULL,
+  version_id uuid NOT NULL,
+  is_source boolean NOT NULL,
+  content_length bigint NOT NULL,
+  content_type text NOT NULL,
+  extension text,
+  CONSTRAINT file_pkey PRIMARY KEY (id),
+  CONSTRAINT "FK_file_version_id_version_id" FOREIGN KEY (version_id)
+      REFERENCES version (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+INHERITS (core)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE file
+  OWNER TO postgres;
+
+-- Table: asset_matter
+
+-- DROP TABLE asset_matter;
+
+CREATE TABLE asset_matter
+(
+-- Inherited from table core:  created_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  modified_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  disabled_by_user_pid uuid,
+-- Inherited from table core:  utc_created timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_modified timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_disabled timestamp without time zone,
+  id uuid NOT NULL,
+  asset_id uuid NOT NULL,
+  matter_id uuid NOT NULL,
+  CONSTRAINT pkey_asset_matter PRIMARY KEY (id),
+  CONSTRAINT "FK_asset_matter_asset_id_asset_id" FOREIGN KEY (asset_id)
+      REFERENCES asset (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT "FK_asset_matter_matter_id_matter_id" FOREIGN KEY (matter_id)
+      REFERENCES matter (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+INHERITS (core)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE asset_matter
+  OWNER TO postgres;
+
+
+-- Table: asset_tag
+
+-- DROP TABLE asset_tag;
+
+CREATE TABLE asset_tag
+(
+-- Inherited from table core:  created_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  modified_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  disabled_by_user_pid uuid,
+-- Inherited from table core:  utc_created timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_modified timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_disabled timestamp without time zone,
+  id serial NOT NULL,
+  name text NOT NULL,
+  CONSTRAINT asset_tag_pkey PRIMARY KEY (id),
+  CONSTRAINT asset_tag_name_unique UNIQUE (name)
+)
+INHERITS (core)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE asset_tag
+  OWNER TO postgres;
+
+-- Table: asset_asset_tag
+
+-- DROP TABLE asset_asset_tag;
+
+CREATE TABLE asset_asset_tag
+(
+-- Inherited from table core:  created_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  modified_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  disabled_by_user_pid uuid,
+-- Inherited from table core:  utc_created timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_modified timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_disabled timestamp without time zone,
+  id uuid NOT NULL,
+  asset_id uuid NOT NULL,
+  asset_tag_id integer NOT NULL,
+  CONSTRAINT asset_asset_tag_pkey PRIMARY KEY (id),
+  CONSTRAINT "FK_asset_asset_tag_asset_id" FOREIGN KEY (asset_id)
+      REFERENCES asset (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT "FK_asset_asset_tag_asset_tag_id" FOREIGN KEY (asset_tag_id)
+      REFERENCES asset_tag (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+INHERITS (core)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE asset_asset_tag
+  OWNER TO postgres;
+
+
+2/21/2016
+-- Events are no longer supported - May look to Office 365 in the future
+DROP TABLE event_assigned_contact;
+DROP TABLE event_matter;
+DROP TABLE event_note;
+DROP TABLE event_tag;
+DROP TABLE event_task;
+DROP TABLE event;
+-- Forms are no longer supported - HotDocs can access the database
+DROP TABLE form_field_matter;
+DROP TABLE form_field;
+DROP TABLE form;
+-- Tags are no longer supported - in use they were useless - waste of time
+DROP TABLE matter_tag;
+DROP TABLE task_tag;
+DROP TABLE tag_category;
+DROP TABLE tag_filter;
+-- Documents are no longer supported - needs redesigned for better OS integration - may be impelemented in the future
+DROP TABLE document_task;
+DROP TABLE document_matter;
+DROP TABLE version;
+DROP TABLE document;
+
+
+1/1/2016
+
+ALTER TABLE matter
+  DROP COLUMN lead_attorney_contact_id;
+ALTER TABLE matter_contact
+  DROP COLUMN role;
+
+
+12/27/2015
+UPDATE matter_contact SET "is_attorney"=TRUE WHERE LOWER("role") LIKE LOWER('%attorney%');
+UPDATE matter_contact SET "is_lead_attorney"=TRUE WHERE LOWER("role") LIKE LOWER('%lead attorney%');
+UPDATE matter_contact SET "is_client"=TRUE WHERE LOWER("role") LIKE LOWER('client');
+UPDATE matter_contact SET "is_client_contact"=TRUE WHERE LOWER("role") LIKE LOWER('%client contact%');
+UPDATE matter_contact SET "is_appointed"=TRUE WHERE LOWER("role") LIKE LOWER('%appointed client%');
+
+
+-- Table: court_type
+
+-- DROP TABLE court_type;
+
+CREATE TABLE court_type
+(
+-- Inherited from table core:  created_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  modified_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  disabled_by_user_pid uuid,
+-- Inherited from table core:  utc_created timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_modified timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_disabled timestamp without time zone,
+  id serial NOT NULL,
+  title text NOT NULL,
+  CONSTRAINT court_type_pkey PRIMARY KEY (id)
+)
+INHERITS (core)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE court_type
+  OWNER TO postgres;
+
+-- Table: court_geographical_jurisdiction
+
+-- DROP TABLE court_geographical_jurisdiction;
+
+CREATE TABLE court_geographical_jurisdiction
+(
+-- Inherited from table core:  created_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  modified_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  disabled_by_user_pid uuid,
+-- Inherited from table core:  utc_created timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_modified timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_disabled timestamp without time zone,
+  id serial NOT NULL,
+  title text NOT NULL,
+  CONSTRAINT court_geographical_jurisdiction_pkey PRIMARY KEY (id)
+)
+INHERITS (core)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE court_geographical_jurisdiction
+  OWNER TO postgres;
+
+-- Table: court_sitting_in_city
+
+-- DROP TABLE court_sitting_in_city;
+
+CREATE TABLE court_sitting_in_city
+(
+-- Inherited from table core:  created_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  modified_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  disabled_by_user_pid uuid,
+-- Inherited from table core:  utc_created timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_modified timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_disabled timestamp without time zone,
+  id serial NOT NULL,
+  title text NOT NULL,
+  CONSTRAINT court_sitting_in_city_pkey PRIMARY KEY (id)
+)
+INHERITS (core)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE court_sitting_in_city
+  OWNER TO postgres;
+
+ALTER TABLE matter
+  DROP COLUMN jurisdiction;
+ALTER TABLE matter
+  ADD COLUMN attorney_for_party_title text;
+ALTER TABLE matter
+  ADD COLUMN court_type_id integer;
+ALTER TABLE matter
+  ADD COLUMN court_geographical_jurisdiction_id integer;
+ALTER TABLE matter
+  ADD COLUMN court_sitting_in_city_id integer;
+ALTER TABLE matter
+  ADD COLUMN caption_plaintiff_or_subject_short text;
+ALTER TABLE matter
+  ADD COLUMN caption_plaintiff_or_subject_regular text;
+ALTER TABLE matter
+  ADD COLUMN caption_plaintiff_or_subject_long text;
+ALTER TABLE matter
+  ADD COLUMN caption_other_party_short text;
+ALTER TABLE matter
+  ADD COLUMN caption_other_party_regular text;
+ALTER TABLE matter
+  ADD COLUMN caption_other_party_long text;
+ALTER TABLE matter
+  ADD CONSTRAINT "FK_matter_court_type_CourtTypeId" FOREIGN KEY (court_type_id) REFERENCES court_type (id) ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE matter
+  ADD CONSTRAINT "FK_matter_court_geographical_jurisdiction_CourtGeographicalJurisdictionId" FOREIGN KEY (court_geographical_jurisdiction_id) REFERENCES court_geographical_jurisdiction (id) ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE matter
+  ADD CONSTRAINT "FK_matter_court_sitting_in_city_CourtSittingInCityId" FOREIGN KEY (court_sitting_in_city_id) REFERENCES court_sitting_in_city (id) ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+
+
+
+12/26/2015
+
+DROP TABLE event_responsible_user;
+DROP TABLE task_responsible_user;
+DROP TABLE responsible_user;
+
+ALTER TABLE contact
+  ADD COLUMN address1_address_line2 text;
+ALTER TABLE contact
+  ADD COLUMN address2_address_line2 text;
+ALTER TABLE contact
+  ADD COLUMN address3_address_line2 text;
+ALTER TABLE contact
+  ADD COLUMN bar_number text;
+
+ALTER TABLE matter_contact
+  ADD COLUMN is_client boolean;
+ALTER TABLE matter_contact
+  ADD COLUMN is_client_contact boolean;
+ALTER TABLE matter_contact
+  ADD COLUMN is_appointed boolean;
+ALTER TABLE matter_contact
+  ADD COLUMN is_party boolean;
+ALTER TABLE matter_contact
+  ADD COLUMN party_title text;
+ALTER TABLE matter_contact
+  ADD COLUMN is_judge boolean;
+ALTER TABLE matter_contact
+  ADD COLUMN is_witness boolean;
+ALTER TABLE matter_contact
+  ADD COLUMN is_attorney boolean;
+ALTER TABLE matter_contact
+  ADD COLUMN attorney_for_contact_id integer;
+ALTER TABLE matter_contact
+  ADD COLUMN is_lead_attorney boolean;
+ALTER TABLE matter_contact
+  ADD COLUMN is_support_staff boolean;
+ALTER TABLE matter_contact
+  ADD COLUMN support_staff_for_contact_id integer;
+ALTER TABLE matter_contact
+  ADD COLUMN is_third_party_payor boolean;
+ALTER TABLE matter_contact
+  ADD COLUMN third_party_payor_for_contact_id integer;
+
+  
+ALTER TABLE matter_contact
+  ADD CONSTRAINT "FK_matter_contact_contact_AttorneyForContactId" FOREIGN KEY (attorney_for_contact_id) REFERENCES contact (id) ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE matter_contact
+  ADD CONSTRAINT "FK_matter_contact_contact_SupportStaffForContactId" FOREIGN KEY (support_staff_for_contact_id) REFERENCES contact (id) ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE matter_contact
+  ADD CONSTRAINT "FK_matter_contact_contact_ThirdPartyPayorForContactId" FOREIGN KEY (third_party_payor_for_contact_id) REFERENCES contact (id) ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+ALTER TABLE matter
+  ADD COLUMN id_int bigserial NOT NULL;
+
+
+5/25/2015
+-- Table: task_template
+
+-- DROP TABLE task_template;
+
+CREATE TABLE task_template
+(
+-- Inherited from table core:  created_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  modified_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  disabled_by_user_pid uuid,
+-- Inherited from table core:  utc_created timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_modified timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_disabled timestamp without time zone,
+  id serial NOT NULL,
+  task_template_title text NOT NULL,
+  title text,
+  description text,
+  active boolean NOT NULL,
+  projected_start text,
+  due_date text,
+  actual_end text,
+  projected_end text,
+  CONSTRAINT task_template_pkey PRIMARY KEY (id)
+)
+INHERITS (core)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE task_template
+  OWNER TO postgres;
+
+
+5/24/2015
+-- Table: note_notification
+
+-- DROP TABLE note_notification;
+
+CREATE TABLE note_notification
+(
+-- Inherited from table core:  created_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  modified_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  disabled_by_user_pid uuid,
+-- Inherited from table core:  utc_created timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_modified timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_disabled timestamp without time zone,
+  id uuid NOT NULL,
+  contact_id integer NOT NULL,
+  note_id uuid NOT NULL,
+  cleared timestamp without time zone,
+  CONSTRAINT note_notification_pkey PRIMARY KEY (id),
+  CONSTRAINT "note_notification_contact_ContactId" FOREIGN KEY (contact_id)
+      REFERENCES contact (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT "note_notification_note_NoteId" FOREIGN KEY (note_id)
+      REFERENCES note (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+INHERITS (core)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE note_notification
+  OWNER TO postgres;
+
+
+
+4/27/2015
+-- Table: form
+
+-- DROP TABLE form;
+
+CREATE TABLE form
+(
+-- Inherited from table core:  created_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  modified_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  disabled_by_user_pid uuid,
+-- Inherited from table core:  utc_created timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_modified timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_disabled timestamp without time zone,
+  id serial NOT NULL,
+  title text NOT NULL,
+  matter_type_id integer NOT NULL,
+  path text NOT NULL,
+  CONSTRAINT form_pkey PRIMARY KEY (id),
+  CONSTRAINT "form_matter_type_MatterTypeId_Id" FOREIGN KEY (matter_type_id)
+      REFERENCES matter_type (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+INHERITS (core)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE form
+  OWNER TO postgres;
+
+
+4/26/2015
+-- Table: matter_type
+
+-- DROP TABLE matter_type;
+
+CREATE TABLE matter_type
+(
+-- Inherited from table core:  created_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  modified_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  disabled_by_user_pid uuid,
+-- Inherited from table core:  utc_created timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_modified timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_disabled timestamp without time zone,
+  id serial NOT NULL,
+  title text NOT NULL,
+  CONSTRAINT matter_type_pkey PRIMARY KEY (id)
+)
+INHERITS (core)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE matter_type
+  OWNER TO postgres;
+
+ALTER TABLE matter
+  ADD COLUMN matter_type_id integer;
+
+ALTER TABLE matter
+  ADD CONSTRAINT "FK_matter_matter_type_MatterTypeId_Id" FOREIGN KEY (matter_type_id) REFERENCES matter_type (id) ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+
+4/2/2015 - 2
+ALTER TABLE form_field_matter
+  ADD COLUMN value text;
+
+
+4/2/2015
+-- Table: form_field
+
+-- DROP TABLE form_field;
+
+CREATE TABLE form_field
+(
+-- Inherited from table core:  created_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  modified_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  disabled_by_user_pid uuid,
+-- Inherited from table core:  utc_created timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_modified timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_disabled timestamp without time zone,
+  id serial NOT NULL,
+  title text NOT NULL,
+  description text,
+  CONSTRAINT "form_field_PK" PRIMARY KEY (id),
+  CONSTRAINT form_field_title_unique UNIQUE (title)
+)
+INHERITS (core)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE form_field
+  OWNER TO postgres;
+
+-- Table: form_field_matter
+
+-- DROP TABLE form_field_matter;
+
+CREATE TABLE form_field_matter
+(
+-- Inherited from table core:  created_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  modified_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  disabled_by_user_pid uuid,
+-- Inherited from table core:  utc_created timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_modified timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_disabled timestamp without time zone,
+  id uuid NOT NULL,
+  matter_id uuid NOT NULL,
+  form_field_id integer NOT NULL,
+  CONSTRAINT "form_field_matter_PK" PRIMARY KEY (id),
+  CONSTRAINT "form_field_matter_form_field_FormFieldId" FOREIGN KEY (form_field_id)
+      REFERENCES form_field (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT "form_field_matter_matter_MatterId" FOREIGN KEY (matter_id)
+      REFERENCES matter (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+INHERITS (core)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE form_field_matter
+  OWNER TO postgres;
+
+
+
+2/28/2015
+
+ALTER TABLE contact
+  ADD COLUMN billing_rate_id integer;
+ALTER TABLE contact
+  ADD CONSTRAINT "FK_contact_billing_rate_BillingRateId" FOREIGN KEY (billing_rate_id) REFERENCES billing_rate (id) ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE matter
+  ADD CONSTRAINT "FK_matter_billing_group_BillingGroupId" FOREIGN KEY (billing_group_id) REFERENCES billing_group (id) ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE matter
+  ADD COLUMN override_matter_rate_with_employee_rate boolean NOT NULL DEFAULT false;
+
+
+2/20/2015
+
+Changes to invoice
+
+ALTER TABLE invoice
+  ADD COLUMN billing_group_id integer;
+ALTER TABLE invoice
+  ADD CONSTRAINT "FK_invoice_billing_group_BillingGroupIp" FOREIGN KEY (billing_group_id) REFERENCES billing_group (id) ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+
+2/18/2015
+
+Changes to invoice
+
+ALTER TABLE invoice
+  ADD COLUMN matter_id uuid;
+ALTER TABLE invoice
+  ADD CONSTRAINT "FK_invoice_matter_MatterId" FOREIGN KEY (matter_id) REFERENCES matter (id) ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+
+Table changes to invoice_time
+
+ALTER TABLE invoice_time
+  DROP COLUMN price_per_unit;
+ALTER TABLE invoice_time
+  DROP COLUMN quantity;
+ALTER TABLE invoice_time
+  ADD COLUMN duration interval NOT NULL;
+ALTER TABLE invoice_time
+  ADD COLUMN price_per_hour money NOT NULL;
+
+
+2/16/2015
+
+Add columns to invoice
+
+ALTER TABLE invoice
+  ADD COLUMN bill_to_name_line_1 text NOT NULL;
+ALTER TABLE invoice
+  ADD COLUMN bill_to_name_line_2 text;
+ALTER TABLE invoice
+  ADD COLUMN bill_to_address_line_1 text NOT NULL;
+ALTER TABLE invoice
+  ADD COLUMN bill_to_address_line_2 text;
+ALTER TABLE invoice
+  ADD COLUMN bill_to_city text NOT NULL;
+ALTER TABLE invoice
+  ADD COLUMN bill_to_state text NOT NULL;
+ALTER TABLE invoice
+  ADD COLUMN bill_to_zip text NOT NULL;
+
+
+2/15/2015
+
+Add columns to matter
+
+ALTER TABLE matter
+  ADD COLUMN default_billing_rate_id integer;
+ALTER TABLE matter
+  ADD COLUMN billing_group_id integer;
+ALTER TABLE matter
+  ADD CONSTRAINT "FK_matter_billing_rate_DefaultBillingRateId_Id" FOREIGN KEY (default_billing_rate_id) REFERENCES billing_rate (id) ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE matter
+  ADD CONSTRAINT "FK_matter_billing_group_BillingGroupId_Id" FOREIGN KEY (billing_group_id) REFERENCES billing_group (id) ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+
+
+Add billing_group table
+
+-- Table: billing_group
+
+-- DROP TABLE billing_group;
+
+CREATE TABLE billing_group
+(
+-- Inherited from table core:  created_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  modified_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  disabled_by_user_pid uuid,
+-- Inherited from table core:  utc_created timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_modified timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_disabled timestamp without time zone,
+  id serial NOT NULL,
+  title text NOT NULL,
+  last_run timestamp without time zone,
+  next_run timestamp without time zone NOT NULL,
+  amount money NOT NULL,
+  bill_to_contact_id integer NOT NULL,
+  CONSTRAINT billing_group_pkey PRIMARY KEY (id),
+  CONSTRAINT "FK_billing_group_contact_BillToContactId_Id" FOREIGN KEY (bill_to_contact_id)
+      REFERENCES contact (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+INHERITS (core)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE billing_group
+  OWNER TO postgres;
+
+
+
+2/8/2015
+ALTER TABLE invoice
+  ADD COLUMN external_invoice_id text;
+
+
+1/29/2015
+
+-- Table: expense
+
+-- DROP TABLE expense;
+
+CREATE TABLE expense
+(
+-- Inherited from table core:  created_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  modified_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  disabled_by_user_pid uuid,
+-- Inherited from table core:  utc_created timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_modified timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_disabled timestamp without time zone,
+  id uuid NOT NULL,
+  incurred timestamp without time zone NOT NULL,
+  paid timestamp without time zone,
+  vendor text NOT NULL,
+  amount money NOT NULL,
+  details text NOT NULL,
+  CONSTRAINT expense_pkey PRIMARY KEY (id)
+)
+INHERITS (core)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE expense
+  OWNER TO postgres;
+
+-- Table: expense_matter
+
+-- DROP TABLE expense_matter;
+
+CREATE TABLE expense_matter
+(
+-- Inherited from table core:  created_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  modified_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  disabled_by_user_pid uuid,
+-- Inherited from table core:  utc_created timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_modified timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_disabled timestamp without time zone,
+  id uuid NOT NULL,
+  matter_id uuid NOT NULL,
+  expense_id uuid NOT NULL,
+  CONSTRAINT expense_matter_pkey PRIMARY KEY (id),
+  CONSTRAINT "FK_expense_matter_ExpenseId" FOREIGN KEY (expense_id)
+      REFERENCES expense (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT "FK_expense_matter_MatterId" FOREIGN KEY (matter_id)
+      REFERENCES matter (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+INHERITS (core)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE expense_matter
+  OWNER TO postgres;
+
+-- Table: fee
+
+-- DROP TABLE fee;
+
+CREATE TABLE fee
+(
+-- Inherited from table core:  created_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  modified_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  disabled_by_user_pid uuid,
+-- Inherited from table core:  utc_created timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_modified timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_disabled timestamp without time zone,
+  id uuid NOT NULL,
+  incurred timestamp without time zone NOT NULL,
+  amount money NOT NULL,
+  details text NOT NULL,
+  CONSTRAINT fee_pkey PRIMARY KEY (id)
+)
+INHERITS (core)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE fee
+  OWNER TO postgres;
+
+-- Table: fee_matter
+
+-- DROP TABLE fee_matter;
+
+CREATE TABLE fee_matter
+(
+-- Inherited from table core:  created_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  modified_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  disabled_by_user_pid uuid,
+-- Inherited from table core:  utc_created timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_modified timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_disabled timestamp without time zone,
+  id uuid NOT NULL,
+  matter_id uuid NOT NULL,
+  fee_id uuid NOT NULL,
+  CONSTRAINT fee_matter_pkey PRIMARY KEY (id),
+  CONSTRAINT "fee_matter_FeeId" FOREIGN KEY (fee_id)
+      REFERENCES fee (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT "fee_matter_MatterId" FOREIGN KEY (matter_id)
+      REFERENCES matter (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+INHERITS (core)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE fee_matter
+  OWNER TO postgres;
+
+-- Table: invoice
+
+-- DROP TABLE invoice;
+
+CREATE TABLE invoice
+(
+-- Inherited from table core:  created_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  modified_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  disabled_by_user_pid uuid,
+-- Inherited from table core:  utc_created timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_modified timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_disabled timestamp without time zone,
+  id uuid NOT NULL,
+  bill_to_contact_id integer NOT NULL,
+  date timestamp without time zone NOT NULL,
+  due timestamp without time zone NOT NULL,
+  subtotal money NOT NULL,
+  tax_amount money NOT NULL,
+  total money NOT NULL,
+  CONSTRAINT invoice_pkey PRIMARY KEY (id),
+  CONSTRAINT "invoice_contact_BillToContactId" FOREIGN KEY (bill_to_contact_id)
+      REFERENCES contact (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+INHERITS (core)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE invoice
+  OWNER TO postgres;
+
+-- Table: invoice_expense
+
+-- DROP TABLE invoice_expense;
+
+CREATE TABLE invoice_expense
+(
+-- Inherited from table core:  created_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  modified_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  disabled_by_user_pid uuid,
+-- Inherited from table core:  utc_created timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_modified timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_disabled timestamp without time zone,
+  id uuid NOT NULL,
+  invoice_id uuid NOT NULL,
+  expense_id uuid NOT NULL,
+  amount money NOT NULL,
+  details text NOT NULL,
+  CONSTRAINT invoice_expense_pkey PRIMARY KEY (id),
+  CONSTRAINT "invoice_expense_expense_ExpenseId" FOREIGN KEY (expense_id)
+      REFERENCES expense (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT "invoice_expense_invoice_InvoiceId" FOREIGN KEY (invoice_id)
+      REFERENCES invoice (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+INHERITS (core)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE invoice_expense
+  OWNER TO postgres;
+
+-- Table: invoice_fee
+
+-- DROP TABLE invoice_fee;
+
+CREATE TABLE invoice_fee
+(
+-- Inherited from table core:  created_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  modified_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  disabled_by_user_pid uuid,
+-- Inherited from table core:  utc_created timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_modified timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_disabled timestamp without time zone,
+  id uuid NOT NULL,
+  invoice_id uuid NOT NULL,
+  fee_id uuid NOT NULL,
+  amount money NOT NULL,
+  tax_amount money NOT NULL,
+  details text NOT NULL,
+  CONSTRAINT invoice_fee_pkey PRIMARY KEY (id),
+  CONSTRAINT "invoice_fee_fee_FeeId" FOREIGN KEY (fee_id)
+      REFERENCES fee (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT "invoice_fee_invoice_InvoiceId" FOREIGN KEY (invoice_id)
+      REFERENCES invoice (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+INHERITS (core)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE invoice_fee
+  OWNER TO postgres;
+
+-- Table: invoice_time
+
+-- DROP TABLE invoice_time;
+
+CREATE TABLE invoice_time
+(
+-- Inherited from table core:  created_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  modified_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  disabled_by_user_pid uuid,
+-- Inherited from table core:  utc_created timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_modified timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_disabled timestamp without time zone,
+  id uuid NOT NULL,
+  invoice_id uuid NOT NULL,
+  time_id uuid NOT NULL,
+  price_per_unit money NOT NULL,
+  quantity numeric(10,4) NOT NULL DEFAULT 1,
+  details text NOT NULL,
+  CONSTRAINT invoice_time_pkey PRIMARY KEY (id),
+  CONSTRAINT "invoice_time_invoice_InvoiceId" FOREIGN KEY (invoice_id)
+      REFERENCES invoice (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT "invoice_time_time_TimeId" FOREIGN KEY (time_id)
+      REFERENCES "time" (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+INHERITS (core)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE invoice_time
+  OWNER TO postgres;
+
+
+
+
+-------------------------------------------------------------------------------------
+
+1/27/2015
+To add columns to matter
+
+ALTER TABLE matter
+  ADD COLUMN minimum_charge money;
+ALTER TABLE matter
+  ADD COLUMN estimated_charge money;
+ALTER TABLE matter
+  ADD COLUMN maximum_charge money;
+
+
+
+1/25/2015
+To create the billing_rate table
+
+-- Table: billing_rate
+
+-- DROP TABLE billing_rate;
+
+CREATE TABLE billing_rate
+(
+-- Inherited from table core:  created_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  modified_by_user_pid uuid NOT NULL,
+-- Inherited from table core:  disabled_by_user_pid uuid,
+-- Inherited from table core:  utc_created timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_modified timestamp without time zone NOT NULL,
+-- Inherited from table core:  utc_disabled timestamp without time zone,
+  id serial NOT NULL,
+  title text NOT NULL,
+  price_per_unit money NOT NULL,
+  CONSTRAINT billing_rates_pkey PRIMARY KEY (id),
+  CONSTRAINT billing_rates_title_unique UNIQUE (title)
+)
+INHERITS (core)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE billing_rate
+  OWNER TO postgres;
+
+
+
+
+1/24/2015
+To create a billable field in each time entry
+
+ALTER TABLE "time"
+   ADD COLUMN billable boolean NOT NULL DEFAULT false;
+
+
+1/4/2015
+To create a bill to field in the matter
+
+ALTER TABLE matter
+  ADD COLUMN bill_to_contact_id integer;
+
+
+10/11/2014
+To create the external_session table
+
+CREATE TABLE external_session
+(
+  id uuid NOT NULL,
+  user_pid uuid NOT NULL,
+  app_name text NOT NULL,
+  machine_id uuid NOT NULL,
+  utc_created timestamp without time zone NOT NULL,
+  utc_expires timestamp without time zone NOT NULL,
+  timeout integer NOT NULL,
+  CONSTRAINT external_session_pkey PRIMARY KEY (id),
+  CONSTRAINT "FK_external_session_users_UserPId" FOREIGN KEY (user_pid)
+      REFERENCES "Users" ("pId") MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE external_session
+  OWNER TO postgres;
+
+
+9/7/2014
+To give notes a "date" field so that the note can be dated besides with the core properties.
+
+ALTER TABLE note
+  ADD COLUMN "timestamp" timestamp without time zone;
+
+Below will set timestamp to the created time
+
+UPDATE note SET "timestamp"=utc_created;
+
+Below will make timestamp a required field
+
+ALTER TABLE note
+   ALTER COLUMN "timestamp" SET NOT NULL;
+
+
+8/16/2014
+
+Removed from Users - THIS IS NOT A SCHEMA UPDATE - it is only noted here to record the fact that the installer will no longer create the "Administrator" account, instead it now allows
+	the person doing the install to create their account with administrator privileges.  This will also close issue #53
+"23421fc4-c3d3-4ac9-992e-16d3df11c2c3";"Administrator";"Website";"lucas_nodine_01@hotmail.com";"";"gzyziKE4+3wa5wbFI95PXbzEUvY=";"";"";TRUE;"2014-06-29 22:35:02.808-05";"2014-06-29 23:16:29.688-05";"2014-06-29 22:35:02.808-05";"2014-06-29 22:35:02.808-05";;FALSE;"2014-06-29 22:35:02.808-05";0;"2014-06-29 22:35:02.808-05";0;"2014-06-29 22:35:02.808-05"
+
+
+8/11/2014
+For issue #47
+
+ALTER TABLE matter
+  ADD COLUMN jurisdiction text;
+ALTER TABLE matter
+  ADD COLUMN case_number text;
+ALTER TABLE matter
+  ADD COLUMN lead_attorney_contact_id integer;
+ALTER TABLE matter
+  ADD CONSTRAINT "FK_matter_contact_lead_attorney_contact_id" FOREIGN KEY (lead_attorney_contact_id) REFERENCES contact (id) ON UPDATE NO ACTION ON DELETE NO ACTION;
+

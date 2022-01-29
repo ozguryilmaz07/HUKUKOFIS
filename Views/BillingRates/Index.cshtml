@@ -1,0 +1,73 @@
+@model IEnumerable<OpenLawOffice.Web.ViewModels.Billing.BillingRateViewModel>
+
+@{
+    Layout = "~/Views/Shared/_NewLayout.cshtml";
+    ViewBag.Title = "Billing Rates";
+    ViewBag.PageTitle = "Billing Rates";
+}
+
+@section Breadcrumb {
+    <ul class="breadcrumb">
+        <li><a href="/Settings">Settings</a></li>
+        <li><a href="/BillingRates" class="active">Billing Rates</a></li>
+    </ul>
+}
+
+<script type="text/javascript">
+    $(function () {
+        $("#new").click(function () {
+            window.location = '/BillingRates/Create';
+        })
+    })
+</script>
+
+<div class="container-fluid">
+    <div class="row text-right">
+        <div class="btn-group">
+            <button id="new" class="btn btn-sm btn-primary">
+                <span class="fa fa-plus"></span> Create
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        Billing Rates
+    </div>
+    <div class="panel-body">
+        <table class="table table-striped table-condensed table-hover table-text-small">
+            <thead>
+                <tr>
+                    <th style="text-align: center;">
+                        Title
+                    </th>
+                    <th style="text-align: center;">
+                        Price Per Unit
+                    </th>
+                    <th style="text-align: center; width: 25px;">
+
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @(item.Title)
+                    </td>
+                    <td>
+                        @(item.PricePerUnit.ToString("C"))
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-xs btn-default" onclick="navTo('/BillingRates/Edit/@(item.Id.Value)')">
+                            <span class="fa fa-pencil"></span> Edit
+                        </button>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</div>

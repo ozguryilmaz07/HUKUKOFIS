@@ -1,0 +1,94 @@
+@model IEnumerable<OpenLawOffice.Web.ViewModels.Account.UsersViewModel>
+
+@{ 
+    Layout = "~/Views/Shared/_NewLayout.cshtml";
+    ViewBag.Title = "Administration";
+    ViewBag.PageTitle = "Administration";
+}
+
+@section Breadcrumb {
+    <ul class="breadcrumb">
+        <li><a href="/Settings">Settings</a></li>
+        <li><a href="/Admin" class="active">Administration</a></li>
+    </ul>
+}
+
+<script type="text/javascript">
+    $(function () {
+        $("#newUser").click(function () {
+            window.location = '/Admin/CreateUser';
+        })
+    })
+</script>
+
+<div class="container-fluid">
+    <div class="row text-right">
+        <div class="btn-group">
+            <button id="newUser" class="btn btn-sm btn-primary">
+                <span class="fa fa-plus"></span> New User
+            </button>
+        </div>
+    </div>
+</div>
+
+<table class="table table-striped table-condensed table-hover notifications">
+    <thead>
+        <tr>
+            <th>
+                Username
+            </th>
+            <th>
+                Email
+            </th>
+            <th>
+                Approved
+            </th>
+            <th>
+                Locked Out
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model)
+{
+        <tr>
+            <td>
+                @(Html.ActionLink(item.Username, "DetailsUser", new { id = item.Username }))
+            </td>
+            <td>
+                @(item.Email)
+            </td>
+            <td>
+                @if (item.IsApproved)
+            {<text>Yes</text>}
+            else
+            {<text>No</text>}
+            </td>
+            <td>
+                @if (item.IsLockedOut)
+            {<text>Yes</text>}
+            else
+            {<text>No</text>}
+            </td>
+            <td>
+                @(Html.ActionLink("Edit", "EditUser", new { Id = item.Username }))<br />
+                @(Html.ActionLink("Roles", "UserRoles", new { Id = item.Username }))<br />
+
+                @if (item.IsLockedOut)
+                {
+                    @(Html.ActionLink("Unlock", "UnlockUser", new { Id = item.Username }))<br />
+                }
+
+                @if (item.IsApproved)
+                {
+                    @(Html.ActionLink("Disable", "DisableUser", new { Id = item.Username }))<br />
+                }
+
+                @(Html.ActionLink("Reset Password", "ResetPassword", new { Id = item.Username }))<br />
+                @(Html.ActionLink("Change Password", "ChangePassword", new { Id = item.Username }))
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

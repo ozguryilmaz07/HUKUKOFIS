@@ -1,0 +1,43 @@
+@model IEnumerable<OpenLawOffice.Web.ViewModels.Notes.NoteTaskViewModel>
+
+@{ 
+    Layout = "~/Views/Shared/_NewLayout.cshtml";
+    ViewBag.Title = "Matter Notes";
+    ViewBag.PageTitle = "Matter Notes";
+}
+
+@section Breadcrumb {
+    <ul class="breadcrumb">
+        <li><a href="/Matters">Matters</a></li>
+        <li>Matter: <a href="/Matters/Details/@(ViewBag.Matter.Id)">@(ViewBag.Matter.Title)</a></li>
+        <li><a href="/Matters/Notes/@(ViewBag.Matter.Id)" class="active">Notes</a></li>
+    </ul>
+}
+
+<script language="javascript">
+    $(function () {
+        $("#new").click(function () {
+            window.location = "/Notes/Create?MatterId=@(ViewBag.Matter.Id)";
+        });
+    });
+</script>
+
+<div class="container-fluid">
+    <div class="row text-right">
+        <div class="btn-group">
+            <button id="new" type="button" class="btn btn-sm btn-primary"><span class="fa fa-plus"></span> New Note</button>
+        </div>
+    </div>
+</div>
+
+@foreach (var item in Model)
+{
+<p>
+    <div>Date/Time: @(item.Note.Timestamp)</div>
+    <div>Task: @if (item.Task != null) {
+                @(Html.ActionLink(item.Task.Title, "Details", "Tasks", new { id = item.Task.Id }, null))
+                }</div>
+    <div>Title: @(Html.ActionLink(item.Note.Title, "Details", "Notes", new { id = item.Note.Id }, null))</div>
+    <div>@(item.Note.Body)</div>
+</p><hr />
+}

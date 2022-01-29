@@ -1,0 +1,56 @@
+﻿@{
+    Layout = null;
+}
+
+@model OpenLawOffice.Web.ViewModels.Account.RecoveryViewModel
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>Login</title>
+    <!-- Bootstrap core CSS -->
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/Content/font-awesome.min.css" />
+
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    @*<link href="../../assets/css/ie10-viewport-bug-workaround.css" rel="stylesheet">*@
+
+    <!-- Custom styles for this template -->
+    <link href="~/Content/signin.css" rel="stylesheet" />
+</head>
+<body>
+    <div class="container">
+
+        @using (Html.BeginForm("Recovery", "Account", FormMethod.Post, new { @class = "form-signin" }))
+        {
+            if (ViewData["Error"] != null)
+            {
+                if ((string)ViewBag.Error == "username")
+                {
+                    <div style="color: Red; height: 35px;">Unable to find that username in our system.</div>
+                }
+                else if ((string)ViewBag.Error == "email")
+                {
+                    <div style="color: Red; height: 35px;">Unable to find that email address in our system.</div>
+                }
+            }
+
+            <h2 class="form-signin-heading">Enter one</h2>
+            @(Html.TextBoxFor(m => m.UserName, new { @class = "form-control", @placeholder = "Username", @required = "required", @autofocus = "autofocus" }))
+
+            <div>- OR -</div>
+            
+            @(Html.TextBoxFor(m => m.Email, new { @class = "form-control", @placeholder = "Email", @required = "required", @autofocus = "autofocus" }))
+
+            <div>&nbsp;</div>
+
+            <button class="btn btn-lg btn-primary btn-block" type="submit">Recover</button>
+
+        }
+
+    </div>
+</body>
+</html>

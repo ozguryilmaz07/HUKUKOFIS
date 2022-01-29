@@ -1,0 +1,204 @@
+@model OpenLawOffice.Web.ViewModels.Billing.BillingViewModel
+@using OpenLawOffice.Web.Helpers
+
+@{
+    Layout = "~/Views/Shared/_NewLayout.cshtml";
+    ViewBag.Title = "Billing";
+    ViewBag.PageTitle = "Billing";
+}
+
+@section Breadcrumb {
+    <ul class="breadcrumb">
+        <li><a href="/Billing" class="active">Billing</a></li>
+    </ul>
+}
+
+@using (Html.BeginForm())
+{
+    @(Html.ValidationSummary(true))
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            Billing Groups
+        </div>
+        <div class="panel-body">
+            <table class="table table-striped table-condensed table-hover table-text-small">
+                <thead>
+                    <tr>
+                        <th style="text-align: center;">Title</th>
+                        <th style="text-align: center;">Bill To</th>
+                        <th style="text-align: center;">Last Run</th>
+                        <th style="text-align: center;">Next Run</th>
+                        <th style="text-align: center;">Amount</th>
+                        <th style="text-align: center;">Expenses</th>
+                        <th style="text-align: center;">Fees</th>
+                        <th style="text-align: center;">Time</th>
+                        <th style="width: 20px;"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.GroupItems)
+                    {
+                        <tr>
+                            <td>
+                                @(Html.ActionLink(item.BillingGroup.Title, "Details", "BillingGroups", new { Id = item.BillingGroup.Id }, null))
+                            </td>
+                            <td>
+                                @(Html.ActionLink(item.BillingGroup.BillTo.DisplayName, "Details", "Contacts", new { Id = item.BillingGroup.BillTo.Id }, null))
+                            </td>
+                            <td>
+                                @if (item.BillingGroup.LastRun.HasValue)
+                                {
+                                    @(item.BillingGroup.LastRun.Value.ToShortDateString())
+                                }
+                            </td>
+                            <td>
+                                @(item.BillingGroup.NextRun.ToShortDateString())
+                            </td>
+                            <td>
+                                @(string.Format("{0:C}", item.BillingGroup.Amount))
+                            </td>
+                            <td>
+                                @(string.Format("{0:C}", item.Expenses))
+                            </td>
+                            <td>
+                                @(string.Format("{0:C}", item.Fees))
+                            </td>
+                            <td>
+                                @(TimeSpanHelper.TimeSpan(item.Time, false))
+                            </td>
+                            <td style="text-align: center;">
+                                <button type="button" class="btn btn-xs btn-default" onclick="navTo('/Billing/SingleGroupBill/@(item.BillingGroup.Id)')">
+                                    <span class="fa fa-money"></span> Bill
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <br />
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            Individual Matters
+        </div>
+        <div class="panel-body">
+            <table class="table table-striped table-condensed table-hover table-text-small">
+                <thead>
+                    <tr>
+                        <th style="text-align: center;">Bill To</th>
+                        <th style="text-align: center;">Matter</th>
+                        <th style="text-align: center;">Case No.</th>
+                        <th style="text-align: center;">Expenses</th>
+                        <th style="text-align: center;">Fees</th>
+                        <th style="text-align: center;">Time</th>
+                        <th style="width: 20px;"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Items)
+                    {
+                        <tr>
+                            <td>
+                                @if (item.BillTo != null && item.BillTo.Id.HasValue)
+                                {
+                                    @(Html.ActionLink(item.BillTo.DisplayName, "Details", "Contacts", new { Id = item.BillTo.Id }, null))
+                                }
+                            </td>
+                            <td>
+                                @(Html.ActionLink(item.Matter.Title, "Details", "Matters", new { Id = item.Matter.Id }, null))
+                            </td>
+                            <td>
+                                @(item.Matter.CaseNumber)
+                            </td>
+                            <td>
+                                @(string.Format("{0:C}", item.Expenses))
+                            </td>
+                            <td>
+                                @(string.Format("{0:C}", item.Fees))
+                            </td>
+                            <td>
+                                @(TimeSpanHelper.TimeSpan(item.Time, false))
+                            </td>
+                            <td style="text-align: center;">
+                                <button type="button" class="btn btn-xs btn-default" onclick="navTo('/Billing/SingleMatterBill/@(item.Matter.Id)')">
+                                    <span class="fa fa-money"></span> Bill
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <br />
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            Recently Created Invoices
+        </div>
+        <div class="panel-body">
+            <table class="table table-striped table-condensed table-hover table-text-small">
+                <thead>
+                    <tr>
+                        @*<th style="text-align: center; width: 20px;" />*@
+                        <th style="text-align: center;">Bill To</th>
+                        <th style="text-align: center;">Matter/Group</th>
+                        <th style="text-align: center;">Case No.</th>
+                        <th style="text-align: center;">Total</th>
+                        <th style="width: 20px;">
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.RecentInvoices)
+                    {
+                        <tr>
+                            <td>
+                                @if (item.BillTo != null && item.BillTo.Id.HasValue)
+                                {
+                                    @(Html.ActionLink(item.BillTo.DisplayName, "Details", "Contacts", new { Id = item.BillTo.Id }, null))
+                                }
+                            </td>
+                            <td>
+                                @if (item.Matter != null)
+                                {
+                                    @(Html.ActionLink(item.Matter.Title, "Details", "Matters", new { Id = item.Matter.Id }, null))
+                                }
+                                else
+                                {
+                                    @(Html.ActionLink(item.BillingGroup.Title, "Details", "BillingGroups", new { Id = item.BillingGroup.Id }, null))
+                                }
+                            </td>
+                            <td>
+                                @if (item.Matter != null)
+                                {
+                                    @(item.Matter.CaseNumber)
+                                }
+                            </td>
+                            <td>
+                                @(string.Format("{0:C}", item.Total))
+                            </td>
+                            <td style="text-align: center;">
+                                @if (item.Matter != null)
+                                {
+                                    <buttonn type="button" class="btn btn-xs btn-default" onclick="navTo('/Invoices/MatterDetails/@(item.Id)')">
+                                        <span class="fa fa-money"></span> View
+                                    </buttonn>
+                                }
+                                else
+                                {
+                                    <button type="button" class="btn btn-xs btn-default" onclick="navTo('/Invoices/GroupDetails/@(item.Id)')">
+                                        <span class="fa fa-money"></span> View
+                                    </button>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

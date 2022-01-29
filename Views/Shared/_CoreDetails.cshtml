@@ -1,0 +1,35 @@
+﻿@model OpenLawOffice.Web.ViewModels.CoreViewModel
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        Core Details
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-sm-1">Created:</div>
+            <div class="col-sm-3">
+            @*@if (Model.CreatedBy.PId.HasValue)
+            {
+                <text><a href="/Contacts/Details/@Model.CreatedBy.PId.Value.ToString()" target="_blank">@(Model.CreatedBy.Username)</a></text>
+            }
+            else
+            {*@
+                <text>@(Model.CreatedBy.Username)</text>
+            @*}*@
+            at @(String.Format("{0:g}", Model.Created.Value))</div>
+            <div class="col-sm-1">Modified:</div>
+            <div class="col-sm-3">@(Model.ModifiedBy.Username) at @(String.Format("{0:g}", Model.Modified.Value))</div>
+            <div class="col-sm-1">Disabled:</div>
+            <div class="col-sm-3">
+                @if (Model.DisabledBy != null)
+                {
+                    <text>@(Model.DisabledBy.Username)</text>
+                }
+                @if (Model.Disabled.HasValue)
+                {
+                    <text>at @(String.Format("{0:g}", Model.Disabled.Value))</text>
+                }
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,118 @@
+@model IEnumerable<OpenLawOffice.Web.ViewModels.Account.SelectableUserRoleViewModel>
+
+@{
+    Layout = "~/Views/Shared/_NewLayout.cshtml";
+    ViewBag.Title = "User's Roles";
+    ViewBag.PageTitle = "User's Roles";
+}
+
+@section Breadcrumb {
+    <ul class="breadcrumb">
+        <li><a href="/Settings">Settings</a></li>
+        <li><a href="/Admin">Administration</a></li>
+        <li>User: <a href="/Admin/Details/@(ViewContext.RouteData.Values["Id"])">@(ViewContext.RouteData.Values["Id"])</a></li>
+        <li><a href="/Admin/UnlockUser/@(Request["Id"])">Unlock</a></li>
+    </ul>
+}
+
+<script type="text/javascript">
+    $(function () {
+        $("#newUser").click(function () {
+            window.location = '/Admin/CreateUser';
+        })
+        $("#details").click(function () {
+            window.location = '/Admin/DetailsUser/@(ViewContext.RouteData.Values["Id"])';
+        })
+        $("#edit").click(function () {
+            window.location = '/Admin/EditUser/@(ViewContext.RouteData.Values["Id"])';
+        })
+        $("#roles").click(function () {
+            window.location = '/Admin/UserRoles/@(ViewContext.RouteData.Values["Id"])';
+        })
+        $("#disable").click(function () {
+            window.location = '/Admin/DisableUser/@(ViewContext.RouteData.Values["Id"])';
+        })
+        $("#unlock").click(function () {
+            window.location = '/Admin/UnlockUser/@(ViewContext.RouteData.Values["Id"])';
+        })
+        $("#changePassword").click(function () {
+            window.location = '/Admin/ChangePassword/@(ViewContext.RouteData.Values["Id"])';
+        })
+        $("#resetPassword").click(function () {
+            window.location = '/Admin/ResetPassword/@(ViewContext.RouteData.Values["Id"])';
+        })
+    })
+</script>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-3 text-left" style="margin: 0px; padding: 0px;">
+            <button id="SelectAll" class="btn btn-sm btn-primary"><span class="fa fa-check-square-o"></span> Select All</button>
+            <button id="DeselectAll" class="btn btn-sm btn-primary"><span class="fa fa-square-o"></span> Deselect All</button>
+        </div>
+        <div class="col-sm-9 text-right" style="margin: 0px; padding: 0px;">
+            <div class="btn-group">
+                <button id="newUser" class="btn btn-sm btn-primary"><span class="fa fa-plus"></span> New User</button>
+                <button id="details" class="btn btn-sm btn-primary"><span class="fa fa-info"></span> Detail</button>
+                <button id="edit" class="btn btn-sm btn-primary"><span class="fa fa-pencil"></span> Edit</button>
+                <button id="roles" class="btn btn-sm btn-primary"><span class="fa fa-user-secret"></span> Roles</button>
+                <button id="disable" class="btn btn-sm btn-primary"><span class="fa fa-times"></span> Disable</button>
+                <button id="unlock" class="btn btn-sm btn-primary"><span class="fa fa-unlock"></span> Unlock</button>
+                <button id="changePassword" class="btn btn-sm btn-primary"><span class="fa fa-key"></span> Change Password</button>
+                <button id="resetPassword" class="btn btn-sm btn-primary"><span class="fa fa-recycle"></span> Reset Password</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div style="width: 70px; padding-bottom: 5px;">
+    <script language="javascript">
+
+        $(function () {
+            var cbs = [];
+
+            @foreach (var item in Model)
+            {
+                @(Html.Raw("cbs.push('" + item.Username + "_" + item.Rolename + "');"))
+            }
+
+            $("#SelectAll").click(function () {
+                for (var i = 0; i < cbs.length; i++) {
+                    $("#CB_" + cbs[i]).prop('checked', true);
+                }
+            });
+
+            $("#DeselectAll").click(function () {
+                for (var i = 0; i < cbs.length; i++) {
+                    $("#CB_" + cbs[i]).prop('checked', false);
+                }
+            });
+        });
+    </script>
+</div>
+
+@using (Html.BeginForm("UserRoles", "Admin", FormMethod.Post, new { @class = "form-horizontal", @role = "form" }))
+{
+    <div class="panel panel-default">
+        <div class="panel-heading">Role Information</div>
+        <div class="panel-body">
+
+            @foreach (var item in Model)
+            {
+                <div class="form-group">
+                    <span class="control-label col-sm-2">@(item.Rolename)</span>
+                    <div class="col-sm-10" style="padding-top: 7px;">
+                        <input type="checkbox" id="CB_@(item.Username)_@(item.Rolename)"
+                               name="CB_@(item.Username)_@(item.Rolename)" @if (item.IsSelected) { <text>checked</text> } />
+                    </div>
+                </div>
+            }
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                    <button type="submit" class="btn btn-default">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}

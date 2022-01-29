@@ -1,0 +1,148 @@
+@model OpenLawOffice.Web.ViewModels.Tasks.CreateTaskViewModel
+
+@{ 
+    Layout = "~/Views/Shared/_NewLayout.cshtml";
+    ViewBag.Title = "Create Task";
+    ViewBag.PageTitle = "Create Task";
+}
+
+<script type="text/javascript" src="/Scripts/moment.min.js"></script>
+<script type="text/javascript" src="/Scripts/tinymce/tinymce.min.js"></script>
+
+<script language="javascript">
+    var templates = @(Html.Raw(ViewBag.TemplateJson));
+    function taskTemplateClick(id) {
+        for (var i = 0; i < templates.length; i++) {
+            if (templates[i].Id == id) {
+                $("#Task_Title").val(templates[i].Title);
+                tinymce.activeEditor.setContent(templates[i].Title);
+                //$("#Task_Description").val(templates[i].Description);
+                if (templates[i].Active)
+                    $("#Task_Active").prop('checked',true);
+                else
+                    $("#Task_Active").prop('checked',false);
+                if (templates[i].ProjectedStart != null)
+                    $("#Task_ProjectedStart").val(moment(templates[i].ProjectedStart).format("M/D/YYYY h:mm:ss A"));
+                else 
+                    $("#Task_ProjectedStart").val(null);
+                if (templates[i].DueDate != null)
+                    $("#Task_DueDate").val(moment(templates[i].DueDate).format("M/D/YYYY h:mm:ss A"));
+                else 
+                    $("#Task_DueDate").val(null);
+                if (templates[i].ProjectedEnd != null)
+                    $("#Task_ProjectedEnd").val(moment(templates[i].ProjectedEnd).format("M/D/YYYY h:mm:ss A"));
+                else 
+                    $("#Task_ProjectedEnd").val(null);
+                if (templates[i].ActualEnd != null)
+                    $("#Task_ActualEnd").val(moment(templates[i].ActualEnd).format("M/D/YYYY h:mm:ss A"));
+                else 
+                    $("#Task_ActualEnd").val(null);
+            }
+        }
+        return false;
+    }
+    $(document).ready(function () {
+        tinymce.init({
+            selector: "#Task_Description",
+            theme: "modern",
+            toolbar: "insertfile undo redo | styleselect | bold underline italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image"
+        });
+        $('#duedatepicker').datetimepicker({
+            format: 'l LT'
+        });
+    });
+</script>
+
+@section Breadcrumb {
+    <ul class="breadcrumb">
+        <li><a href="/Matters">Matters</a></li>
+        <li>Matter: <a href="/Matters/Details/@(ViewBag.Matter.Id)">@(ViewBag.Matter.Title)</a></li>
+        <li><a href="/Matters/Tasks/@(ViewBag.Matter.Id)">Tasks</a></li>
+        <li><a href="/Tasks/Create/@(ViewBag.Matter.Id)">Create</a></li>
+    </ul>
+}
+    
+@using (Html.BeginForm())
+    {
+@(Html.ValidationSummary(true))
+<input type="hidden" id="MatterId" value="@(Request["MatterId"].ToString())" />
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        Task Assignment Details
+    </div>
+    <div class="panel-body">
+        <div class="form-group">
+            <span class="control-label col-sm-2">
+                Title<span class="required-field" title="Required Field">*</span>
+            </span>
+            <div class="col-sm-10">
+                @(Html.TextBoxFor(m => m.Task.Title, new { @class = "form-control" }))
+            </div>
+        </div>
+        <div class="form-group">
+            <span class="control-label col-sm-2">
+            </span>
+            <div class="col-sm-10">                
+            @*// Needs to build to the json being built to hold values*@
+            @foreach (var x in Model.TaskTemplates)
+            {
+                <text>[<a href="javascript:taskTemplateClick('@(x.Id.Value)')">@(x.TaskTemplateTitle)</a>]</text>
+            }
+            </div>
+        </div>
+        <div class="form-group">
+            <span class="control-label col-sm-2">
+                Description<span class="required-field" title="Required Field">*</span>
+            </span>
+            <div class="col-sm-10">
+                @(Html.TextAreaFor(m => m.Task.Description, new { @class = "form-control", @style = "height: 300px;" }))
+            </div>
+        </div>
+        <div class="form-group">
+            <span class="control-label col-sm-2">                
+                Active<span class="required-field" title="Required Field">*</span>
+            </span>
+            <div class="col-sm-10">
+                @(Html.CheckBoxFor(model => model.Task.Active, new { @Checked = true, @class = "form-control", @style = "width: 50px; display: inline;" }))
+                Uncheck if the matter is already completed
+            </div>
+        </div>
+        <div class="form-group">
+            <span class="control-label col-sm-2">
+                Due Date
+            </span>
+            <div class="col-sm-10">
+                <div class='input-group date' id='duedatepicker'>
+                    @(Html.TextBoxFor(model => model.Task.DueDate, new { @class = "form-control" }))
+                    <span class="input-group-addon">
+                        <span class="fa fa-calendar"></span>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <span class="control-label col-sm-2">
+                Assigned Contact
+            </span>
+            <div class="col-sm-10">
+                @(Html.DropDownListFor(x => x.TaskContact.Contact.Id,
+                    new SelectList(ViewBag.EmployeeContactList, "Id", "DisplayName"),
+                    new { @size = 5, @class = "form-control", @style = "width: 100%" }))
+            </div>
+        </div>
+        <div class="form-group">
+            <span class="control-label col-sm-2">
+                Assignment<span class="required-field" title="Required Field">*</span>
+            </span>
+            <div class="col-sm-10">
+                @(Html.EnumDropDownListFor(model => model.TaskContact.AssignmentType, new { @class = "form-control" }))
+            </div>
+        </div>
+    </div>
+</div>
+
+<p>
+    <button type="submit" class="btn btn-lg btn-default">Submit</button>
+</p>
+}

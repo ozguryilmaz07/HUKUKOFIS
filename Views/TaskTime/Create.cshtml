@@ -1,0 +1,156 @@
+@model OpenLawOffice.Web.ViewModels.Tasks.TaskTimeViewModel
+
+@{
+    Layout = "~/Views/Shared/_NewLayout.cshtml";
+    ViewBag.Title = "New Time Entry";
+    ViewBag.PageTitle = "New Time Entry";
+}
+
+@section Breadcrumb {
+    <ul class="breadcrumb">
+        <li><a href="/Matters">Matters</a></li>
+        <li>Matter: <a href="/Matters/Details/@(ViewBag.Matter.Id)">@(ViewBag.Matter.Title)</a></li>
+        <li><a href="/Matters/Tasks/@(ViewBag.Matter.Id)">Tasks</a></li>
+        <li>Task: <a href="/Tasks/Details/@(ViewBag.Task.Id)">@(ViewBag.Task.Title)</a></li>
+        <li><a href="/TaskTime/Create/@(ViewBag.Task.Id)">Create Time Entries</a></li>
+    </ul>
+}
+
+<script language="javascript">
+    $(document).ready(function () {
+        $('#startdatepicker').datetimepicker({
+            format: 'l LT'
+        });
+    });
+</script>
+@using (Html.BeginForm())
+{
+    @(Html.ValidationSummary(true))
+    if (ViewBag.ErrorMessage != null)
+    {
+        <div style="color: Red;">@Html.Raw(ViewBag.ErrorMessage)</div>
+    }
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            Time for Task
+        </div>
+        <div class="panel-body">
+            <div class="row">
+                <div class="form-group">
+                    <span class="control-label col-sm-2">
+                        Task
+                    </span>
+                    <div class="col-sm-10">
+                        @(Html.HiddenFor(model => model.Task.Id))
+                        @(Model.Task.Title)
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group">
+                    <span class="control-label col-sm-2">
+                        Worker
+                    </span>
+                    <div class="col-sm-10">
+                        @(Html.HiddenFor(model => model.Time.Worker.Id))
+                        @(Model.Time.Worker.DisplayName)
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+            <div class="form-group">
+                <span class="control-label col-sm-2">
+                    Billable<span class="required-field" title="Required Field">*</span>
+                </span>
+                <div class="col-sm-10">
+                    @(Html.CheckBoxFor(model => model.Time.Billable, new { @Checked = true, @class = "form-control", @style = "width: 50px; display: inline;" }))
+                    Uncheck if the matter is already completed
+                </div>
+            </div>
+            </div>
+            <div class="row">
+                <div class="form-group">
+                    <span class="control-label col-sm-2">
+                        Time Category
+                    </span>
+                    <div class="col-sm-5">
+                        @(Html.DropDownListFor(x => x.Time.TimeCategory.Id,
+                        new SelectList(ViewBag.TimeCategoryList, "Id", "Title"),
+                        new { @size = 1, @class = "form-control", @style = "width: 100%" }))
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group">
+                    <span class="control-label col-sm-2">
+                        Start Date/Time<span class="required-field" title="Required Field">*</span>
+                    </span>
+                    <div class="col-sm-5">
+                        <div class='input-group date' id='startdatepicker'>
+                            <span class="input-group-addon">
+                                <span class="fa fa-calendar"></span>
+                            </span>
+                            @(Html.TextBoxFor(m => m.Time.Start, new { @class = "form-control", @Value = Model.Time.Start.ToString("M/d/yyyy h:mm tt") }))
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group">
+                    <span class="control-label col-sm-2">
+                        Stop Date/Time<span class="required-field" title="Required Field">*</span>
+                    </span>
+                    <div class="col-sm-10">
+                        <div class="form-group form-inline">
+                            <div class="input-group">
+                                <div id="timeadvance" class="input-group-addon" style="cursor: pointer;">
+                                    <span class="fa fa-hourglass-half"></span>
+                                </div>
+                                @(Html.TextBoxFor(m => m.Time.Stop, new { @class = "form-control" }))
+                            </div>
+                            <script language="javascript">
+                                $(document).ready(function () {
+                                    $('#timeadvance').click(function () {
+                                        var stop, duration;
+                                        var start = moment($('#Time_Start').val());
+
+                                        if (moment($('#Time_Start').val()) > moment()) { // time entry in the future, must treat differently
+                                            stop = moment(start).add(6, 'minutes').format('M/D/YYYY h:mm A');
+                                        }
+                                        else {
+                                            if ($('#Time_Stop').val() == '') {
+                                                duration = moment().diff(start, 'minutes');
+                                            }
+                                            else {
+                                                stop = moment($('#Time_Stop').val());
+                                                duration = stop.diff(start, 'minutes');
+                                            }
+                                            var minutesToAdd = 6 - (duration % 6);
+                                            stop = moment(stop).add(minutesToAdd, 'minutes').format('M/D/YYYY h:mm A');
+                                        }
+                                        $('#Time_Stop').val(stop)
+                                    });
+                                });
+                            </script>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group">
+                    <span class="control-label col-sm-2">
+                        Details
+                    </span>
+                    <div class="col-sm-10">
+                        @(Html.TextAreaFor(m => m.Time.Details, new { @class = "form-control", @style = "height: 300px;" }))
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <p>
+        <button type="submit" class="btn btn-lg btn-default">Submit</button>
+    </p>
+}

@@ -1,0 +1,222 @@
+@model OpenLawOffice.Web.ViewModels.Contacts.ContactViewModel
+
+@{
+    Layout = "~/Views/Shared/_NewLayout.cshtml";
+    ViewBag.Title = "Contact Details";
+    ViewBag.PageTitle = "Contact Details";
+}
+
+@section Breadcrumb {
+    <ul class="breadcrumb">
+        <li><a href="/Contacts">Contacts</a></li>
+        <li>Contact: <a href="/Contacts/Details/@Model.Id" class="active">@(Model.DisplayName)</a></li>
+    </ul>
+}
+
+<script type="text/javascript">
+    $(function () {
+        $("#new").click(function () {
+            window.location = '/Contacts/Create';
+        })
+        $("#details").click(function () {
+            window.location = '/Contacts/Details/@(Model.Id)';
+        })
+        $("#edit").click(function () {
+            window.location = '/Contacts/Edit/@(Model.Id)';
+        })
+        $("#list").click(function () {
+            window.location = '/Contacts';
+        })
+        $("#conflicts").click(function () {
+            window.location = '/Contacts/Conflicts/@(Model.Id)';
+        })
+        $("#matters").click(function () {
+            window.location = '/Contacts/Matters/@(Model.Id)';
+        })
+        $("#tasks").click(function () {
+            window.location = '/Contacts/Tasks/@(Model.Id)';
+        })
+    })
+</script>
+
+<div class="container-fluid">
+    <div class="row text-right">
+        <div class="btn-group">
+            <button id="new" class="btn btn-sm btn-primary"><span class="fa fa-plus"></span> New Contact</button>
+            <button id="details" class="btn btn-sm btn-primary"><span class="fa fa-info"></span> Detail</button>
+            <button id="edit" class="btn btn-sm btn-primary"><span class="fa fa-pencil"></span> Edit</button>
+            <button id="list" class="btn btn-sm btn-primary"><span class="fa fa-list"></span> List</button>
+            <button id="conflicts" class="btn btn-sm btn-primary"><span class="fa fa-shield"></span> Conflicts</button>
+            <button id="matters" class="btn btn-sm btn-primary"><span class="fa fa-briefcase"></span> Matters</button>
+            <button id="tasks" class="btn btn-sm btn-primary"><span class="fa fa-tasks"></span> Tasks</button>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <span class="h4">
+            @Model.DisplayName
+            @if (Model.IsOrganization)
+            {<text>(Company)</text>}
+            else
+            {<text>(Individual)</text>}
+            @if (Model.IsOurEmployee)
+            {<text>(<strong style="color: red;">EMPLOYEE</strong>)</text>}
+        </span>
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-sm-2">Name:</div>
+            <div class="col-sm-3">
+                @if (!string.IsNullOrEmpty(Model.GivenName))
+                {
+                    <text>@Model.GivenName </text>
+                }
+                @if (!string.IsNullOrEmpty(Model.MiddleName))
+                {
+                    <text>@Model.MiddleName </text>
+                }
+                @if (!string.IsNullOrEmpty(Model.Surname))
+                {
+                    <text>@Model.Surname </text>
+                }
+                @if (!string.IsNullOrEmpty(Model.Generation))
+                {
+                    <text>@Model.Generation </text>
+                }
+            </div>
+            <div class="col-sm-2">Referral Source:</div>
+            <div class="col-sm-3">
+                @Model.ReferredByName
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-2">Mailing Address:</div>
+            <div class="col-sm-3">
+                @if (!string.IsNullOrEmpty(Model.Address1AddressStreet) && !string.IsNullOrEmpty(Model.Address1AddressCity))
+                {
+                    string alink = Model.Address1AddressStreet;
+                    if (!string.IsNullOrEmpty(Model.Address1AddressLine2))
+                    {
+                        alink += " " + Model.Address1AddressLine2;
+                    }
+                    if (!string.IsNullOrEmpty(Model.Address1AddressCity))
+                    {
+                        alink += ", " + Model.Address1AddressCity;
+                    }
+                    if (!string.IsNullOrEmpty(Model.Address1AddressStateOrProvince))
+                    {
+                        alink += ", " + Model.Address1AddressStateOrProvince;
+                    }
+                    <text><a href="http://maps.google.com/?q=@alink" target="_blank">
+                        @Model.Address1AddressStreet<br />
+                        @if (!string.IsNullOrEmpty(Model.Address1AddressLine2))
+                        {<text>@Model.Address1AddressLine2<br /></text>}
+                        @Model.Address1AddressCity, @Model.Address1AddressStateOrProvince @Model.Address1AddressPostalCode
+                    </a></text>
+                } else {
+                    <text>
+                    @Model.Address1AddressStreet<br />
+                    @if (!string.IsNullOrEmpty(Model.Address1AddressLine2))
+                    {<text>@Model.Address1AddressLine2<br /></text>}
+                    @Model.Address1AddressCity, @Model.Address1AddressStateOrProvince @Model.Address1AddressPostalCode
+                    </text>
+                }
+            </div>
+            <div class="col-sm-2">Physical Address:</div>
+            <div class="col-sm-3">
+                @if (!string.IsNullOrEmpty(Model.Address2AddressStreet) && !string.IsNullOrEmpty(Model.Address2AddressCity))
+                {
+                    string alink = Model.Address2AddressStreet;
+                    if (!string.IsNullOrEmpty(Model.Address2AddressLine2))
+                    {
+                        alink += " " + Model.Address2AddressLine2;
+                    }
+                    if (!string.IsNullOrEmpty(Model.Address2AddressCity))
+                    {
+                        alink += ", " + Model.Address2AddressCity;
+                    }
+                    if (!string.IsNullOrEmpty(Model.Address2AddressStateOrProvince))
+                    {
+                        alink += ", " + Model.Address2AddressStateOrProvince;
+                    }
+                    <text><a href="http://maps.google.com/?q=@alink" target="_blank">
+                            @Model.Address2AddressStreet<br />
+                            @if (!string.IsNullOrEmpty(Model.Address2AddressLine2))
+                            {<text>@Model.Address2AddressLine2<br /></text>}
+                            @Model.Address2AddressCity, @Model.Address2AddressStateOrProvince @Model.Address2AddressPostalCode
+                        </a></text>
+                }
+                else
+                {
+                    <text>
+                        @Model.Address2AddressStreet<br />
+                        @if (!string.IsNullOrEmpty(Model.Address2AddressLine2))
+                        {<text>@Model.Address2AddressLine2<br /></text>}
+                        @Model.Address2AddressCity, @Model.Address2AddressStateOrProvince @Model.Address2AddressPostalCode
+                    </text>
+                }
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-2">Phone 1:</div>
+            <div class="col-sm-3">
+                @if (!string.IsNullOrEmpty(Model.Telephone1TelephoneNumber))
+                { <text><a href="tel:@Model.Telephone1TelephoneNumber">@Model.Telephone1TelephoneNumber</a></text>}
+            </div>
+            <div class="col-sm-2">Phone 2:</div>
+            <div class="col-sm-3">
+                @if (!string.IsNullOrEmpty(Model.Telephone1TelephoneNumber))
+                { <text><a href="tel:@Model.Telephone2TelephoneNumber">@Model.Telephone2TelephoneNumber</a></text>}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-2">Email:</div>
+            <div class="col-sm-3">
+                @if (!string.IsNullOrEmpty(Model.Email1EmailAddress))
+                { <text><a href="mailto:@Model.Email1EmailAddress">@Model.Email1EmailAddress</a></text>}
+            </div>
+            <div class="col-sm-2">Fax:</div>
+            <div class="col-sm-3">
+                @if (!string.IsNullOrEmpty(Model.Fax1FaxNumber))
+                { <text><a href="tel:@Model.Fax1FaxNumber">@Model.Fax1FaxNumber</a></text>}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        Personal Details
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-sm-1">Gender:</div>
+            <div class="col-sm-2">@Model.Gender</div>
+            <div class="col-sm-1">Birthday:</div>
+            <div class="col-sm-2">@(string.Format("{0:MMM d, yyyy}", Model.Birthday))</div>
+            <div class="col-sm-1">Spouse:</div>
+            <div class="col-sm-2">@Model.SpouseName</div>
+            <div class="col-sm-1">Wedding:</div>
+            <div class="col-sm-2">@(string.Format("{0:MMM d, yyyy}", Model.Wedding))</div>
+        </div>
+    </div>
+</div>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        Professional Details
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-sm-2">Company Name:</div>
+            <div class="col-sm-3">@(Model.CompanyName)</div>
+            <div class="col-sm-1">Title:</div>
+            <div class="col-sm-3">@(Model.Title)</div>
+            <div class="col-sm-1">Bar Number:</div>
+            <div class="col-sm-2">@(Model.BarNumber)</div>
+        </div>
+    </div>
+</div>
+
+@{ Html.RenderPartial("_CoreDetails");}

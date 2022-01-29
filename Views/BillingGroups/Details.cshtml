@@ -1,0 +1,113 @@
+@model OpenLawOffice.Web.ViewModels.Billing.BillingGroupViewModel
+
+@{
+    Layout = "~/Views/Shared/_NewLayout.cshtml";
+    ViewBag.Title = "Billing Group Details";
+    ViewBag.PageTitle = "Billing Group Details";
+}
+
+@section Breadcrumb {
+    <ul class="breadcrumb">
+        <li><a href="/Settings">Settings</a></li>
+        <li><a href="/BillingGroups">Billing Groups</a></li>
+        <li>Group: <a href="/BillingGroups/Details/@(Model.Id)" class="active">@(Model.Title)</a></li>
+    </ul>
+}
+
+<script type="text/javascript">
+    $(function () {
+        $("#new").click(function () {
+            window.location = '/BillingGroups/Create';
+        })
+        $("#details").click(function () {
+            window.location = '/BillingGroups/Details/@(Model.Id)';
+        })
+        $("#edit").click(function () {
+            window.location = '/BillingGroups/Edit/@(Model.Id)';
+        })
+    })
+</script>
+
+<div class="container-fluid">
+    <div class="row text-right">
+        <div class="btn-group">
+            <button id="new" class="btn btn-sm btn-primary"><span class="fa fa-plus"></span> New Group</button>
+            <button id="details" class="btn btn-sm btn-primary"><span class="fa fa-info"></span> Detail</button>
+            <button id="edit" class="btn btn-sm btn-primary"><span class="fa fa-pencil"></span> Edit</button>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        Financial Information
+        <div style="float: right;">
+            <button type="button" onclick="navTo('/BillingGroups/Invoices/@(Model.Id)')" class="btn btn-xs btn-default">
+                <span class="fa fa-money"></span> View Invoices
+            </button>
+        </div>
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-sm-2">Title:</div>
+            <div class="col-sm-3">@(Model.Title)</div>
+            <div class="col-sm-2"></div>
+            <div class="col-sm-2">Last Run:</div>
+            <div class="col-sm-3">
+                @if (Model.LastRun.HasValue)
+                {
+                    @(Model.LastRun.Value.ToShortDateString())
+                }
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-2">Next Run:</div>
+            <div class="col-sm-3">@(Model.NextRun.ToShortDateString())</div>
+            <div class="col-sm-2"></div>
+            <div class="col-sm-2">Amount:</div>
+            <div class="col-sm-3">@(Model.Amount.ToString("C"))</div>
+        </div>
+        <div class="row">
+            <div class="col-sm-2">Bill To:</div>
+            <div class="col-sm-3">@(Html.ActionLink(Model.BillTo.DisplayName, "Details", "Contacts", new { Id = Model.BillTo.Id }, null))</div>
+            <div class="col-sm-2"></div>
+            <div class="col-sm-2"></div>
+            <div class="col-sm-3"></div>
+        </div>
+    </div>
+</div>
+
+<br />
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        Matter Members
+    </div>
+    <div class="panel-body">
+        <table class="table table-striped table-condensed table-hover table-text-small">
+            <thead>
+                <tr>
+                    <th style="text-align: center;">Title</th>
+                    <th style="text-align: center;">Case Number</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var item in Model.MatterMembers)
+            {
+                <tr>
+                    <td>
+                        @(Html.ActionLink(item.Title, "Details", "Matters", new { id = item.Id.Value }, null))
+                    </td>
+                    <td>
+                        @(item.CaseNumber)
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<br />
+
+@{ Html.RenderPartial("_CoreDetails");}
